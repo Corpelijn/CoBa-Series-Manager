@@ -35,6 +35,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Database\DatabaseColumn.cs" />
+    <Compile Include="Database\DatabaseConnection.cs" />
+    <Compile Include="Database\DatabaseConnectionType.cs" />
+    <Compile Include="Database\DatabaseManager.cs" />
+    <Compile Include="Database\DataRow.cs" />
+    <Compile Include="Database\DataTable.cs" />
+    <Compile Include="Database\MySQLConnection.cs" />
+    <Compile Include="Database\OracleConnection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
