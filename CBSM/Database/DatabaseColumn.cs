@@ -4,7 +4,7 @@ using System.Text;
 
 namespace CBSM.Database
 {
-    class DatabaseColumn
+    public class DatabaseColumn
     {
         #region "Fields"
 

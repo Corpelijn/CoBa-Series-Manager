@@ -32,12 +32,12 @@ namespace CBSM.Database
             return;
         }
 
-        public override DataTable ExecuteSelect(string command)
+        public override DataTable ExecuteQuery(string command)
         {
             return null;
         }
 
-        public override bool ExecuteOther(string command)
+        public override bool ExecuteNonQuery(string command)
         {
             return false;
         }

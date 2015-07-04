@@ -41,14 +41,14 @@ namespace CBSM.Database
         /// </summary>
         /// <param name="command">The command to execute. Cannot be null or empty</param>
         /// <returns>A DataTable object containing the requested data</returns>
-        public abstract DataTable ExecuteSelect(string command);
+        public abstract DataTable ExecuteQuery(string command);
 
         /// <summary>
         /// Executes a command to the database
         /// </summary>
         /// <param name="command">The command to execute. Cannot be null or empty</param>
         /// <returns>True if the command was successully executed, false otherwise</returns>
-        public abstract bool ExecuteOther(string command);
+        public abstract bool ExecuteNonQuery(string command);
 
         #endregion
     }

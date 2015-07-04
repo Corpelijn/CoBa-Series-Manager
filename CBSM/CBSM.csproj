@@ -43,6 +43,11 @@
     <Compile Include="Database\DataTable.cs" />
     <Compile Include="Database\MySQLConnection.cs" />
     <Compile Include="Database\OracleConnection.cs" />
+    <Compile Include="Domain\Administratie.cs" />
+    <Compile Include="Domain\Aflevering.cs" />
+    <Compile Include="Domain\Scene.cs" />
+    <Compile Include="Domain\Seizoen.cs" />
+    <Compile Include="Domain\Serie.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace CBSM.Database
 {
-    enum DatabaseConnectionType
+    public enum DatabaseConnectionType
     {
         MySQL = 0,
         Oracle
