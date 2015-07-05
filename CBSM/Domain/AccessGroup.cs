@@ -5,15 +5,15 @@ using System.Text;
 namespace CBSM.Domain
 {
     /// <summary>
-    /// Hold the information of a serie
+    /// Creates a group of rights that can be given to a person (user)
     /// </summary>
-    class Serie
+    class AccessGroup
     {
         #region "Fields"
 
         private int id;
         private string name;
-        private List<Season> seasons;
+        private List<Access> access;
 
         #endregion
 
@@ -23,7 +23,7 @@ namespace CBSM.Domain
         #region "Properties"
 
         /// <summary>
-        /// Gets or sets the name of the serie
+        /// Gets or sets the name of the group
         /// </summary>
         public string Name
         {
@@ -32,12 +32,12 @@ namespace CBSM.Domain
         }
 
         /// <summary>
-        /// Gets or sets the seasons that exist in this serie
+        /// Gets or sets the rights of the group
         /// </summary>
-        public List<Season> Seasons
+        public List<Access> Access
         {
-            get { return new List<Season>(this.seasons); }
-            set { this.seasons = value; }
+            get { return new List<Access>(this.access); }
+            set { this.access = value; }
         }
 
         #endregion

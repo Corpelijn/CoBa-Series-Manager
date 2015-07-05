@@ -4,13 +4,14 @@ using System.Text;
 
 namespace CBSM.Database
 {
-    public class DatabaseManager
+    class DatabaseManager
     {
         #region "Fields"
 
         private string serverip;
         private int serverport;
         private DatabaseConnectionType databaseType;
+        private DatabaseConnection connection;
 
         #endregion
 
@@ -79,7 +80,7 @@ namespace CBSM.Database
         /// <summary>
         /// Checks if the connection to the server is opened
         /// </summary>
-        /// <returns>True when the connection is open, false is the connection is closed</returns>
+        /// <returns>True when the connection is open, false if the connection is closed</returns>
         public bool IsConnected()
         {
             return false;
@@ -88,9 +89,10 @@ namespace CBSM.Database
         /// <summary>
         /// Closes the connection to the server and database
         /// </summary>
-        public void CloseConnection()
+        /// <returns>True if the connection closed, false if the closing failed</returns>
+        public bool CloseConnection()
         {
-            return;
+            return false;
         }
 
         /// <summary>
@@ -132,6 +134,15 @@ namespace CBSM.Database
         public bool ExecuteNonQuery(string command)
         {
             return false;
+        }
+
+        /// <summary>
+        /// Reads the data from the database and returns it into a Administration class 
+        /// </summary>
+        /// <returns>An Administration class object containing the data from the database</returns>
+        public Administration ReadData()
+        {
+            return null;
         }
 
         #endregion

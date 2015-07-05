@@ -43,12 +43,28 @@
     <Compile Include="Database\DataTable.cs" />
     <Compile Include="Database\MySQLConnection.cs" />
     <Compile Include="Database\OracleConnection.cs" />
-    <Compile Include="Domain\Administratie.cs" />
-    <Compile Include="Domain\Aflevering.cs" />
+    <Compile Include="Domain\Access.cs" />
+    <Compile Include="Domain\AccessGroup.cs" />
+    <Compile Include="Administration.cs" />
+    <Compile Include="Domain\Episode.cs" />
+    <Compile Include="Domain\Attribute.cs" />
+    <Compile Include="Domain\Availability.cs" />
+    <Compile Include="Domain\Fragment.cs" />
+    <Compile Include="Domain\Clothing.cs" />
+    <Compile Include="Domain\ClothingPerScene.cs" />
+    <Compile Include="Domain\FragmentStatus.cs" />
+    <Compile Include="Domain\Location.cs" />
+    <Compile Include="Domain\Character.cs" />
+    <Compile Include="Domain\Person.cs" />
     <Compile Include="Domain\Scene.cs" />
-    <Compile Include="Domain\Seizoen.cs" />
+    <Compile Include="Domain\Season.cs" />
     <Compile Include="Domain\Serie.cs" />
+    <Compile Include="Domain\Staff.cs" />
+    <Compile Include="Exceptions\IllegalArgumentException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
