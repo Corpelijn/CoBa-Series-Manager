@@ -56,12 +56,11 @@ namespace CBSM.Domain
         }
 
         /// <summary>
-        /// Gets or sets the unique code for the episode
+        /// Gets the unique code for the episode
         /// </summary>
         public string Code
         {
             get { return this.code; }
-            set { this.code = value; }
         }
 
         /// <summary>

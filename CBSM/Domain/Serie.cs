@@ -13,6 +13,7 @@ namespace CBSM.Domain
 
         private int id;
         private string name;
+        private string codePrefix;
         private List<Season> seasons;
 
         #endregion
@@ -29,6 +30,15 @@ namespace CBSM.Domain
         {
             get { return this.name; }
             set { this.name = value; }
+        }
+
+        /// <summary>
+        /// Gets or Sets the code prefix for the unique code generation of the serie
+        /// </summary>
+        public string CodePrefix
+        {
+            get { return this.codePrefix; }
+            set { this.codePrefix = value; }
         }
 
         /// <summary>

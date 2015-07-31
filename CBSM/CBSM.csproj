@@ -43,6 +43,7 @@
     <Compile Include="Database\DataTable.cs" />
     <Compile Include="Database\MySQLConnection.cs" />
     <Compile Include="Database\OracleConnection.cs" />
+    <Compile Include="Database\SyntaxConverter.cs" />
     <Compile Include="Domain\Access.cs" />
     <Compile Include="Domain\AccessGroup.cs" />
     <Compile Include="Administration.cs" />

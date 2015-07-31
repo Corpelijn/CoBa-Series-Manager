@@ -28,6 +28,8 @@ namespace CBSM.Database
             this.serverip = ip;
             this.serverport = port;
             this.databaseType = database;
+
+            SetupDatabaseConnection();
         }
 
         #endregion
@@ -41,7 +43,11 @@ namespace CBSM.Database
         public string ServerIP
         {
             get { return this.serverip; }
-            set { this.serverip = value; }
+            set
+            {
+                this.serverip = value;
+                this.CloseConnection();
+            }
         }
 
         /// <summary>
@@ -51,7 +57,11 @@ namespace CBSM.Database
         public int ServerPort
         {
             get { return this.serverport; }
-            set { this.serverport = value; }
+            set
+            {
+                this.serverport = value;
+                this.CloseConnection();
+            }
         }
 
         /// <summary>
@@ -61,7 +71,11 @@ namespace CBSM.Database
         public DatabaseConnectionType DatabaseType
         {
             get { return this.databaseType; }
-            set { this.databaseType = value; }
+            set
+            {
+                this.databaseType = value;
+                this.CloseConnection();
+            }
         }
 
         #endregion
@@ -74,7 +88,22 @@ namespace CBSM.Database
         /// <returns>True when the connection if opened, false if the connection failed</returns>
         public bool OpenConnection()
         {
-            return false;
+            // Check if the connection object is created
+            if (connection == null)
+            {
+                // The object is not created, create it
+                SetupDatabaseConnection();
+            }
+
+            // Check if the current connection is active
+            if (connection.IsConnected())
+            {
+                // The current connection is active, return
+                return false;
+            }
+
+            // There is no connction active and the object to connect to is created
+            return connection.OpenConnection(this.serverip, this.serverport);
         }
 
         /// <summary>
@@ -83,7 +112,14 @@ namespace CBSM.Database
         /// <returns>True when the connection is open, false if the connection is closed</returns>
         public bool IsConnected()
         {
-            return false;
+            // Check if there is a connection object
+            if (connection == null)
+            {
+                // There is no connection object, return
+                return false;
+            }
+
+            return connection.IsConnected();
         }
 
         /// <summary>
@@ -92,7 +128,22 @@ namespace CBSM.Database
         /// <returns>True if the connection closed, false if the closing failed</returns>
         public bool CloseConnection()
         {
-            return false;
+            // Check if the connection exists
+            if (connection == null)
+            {
+                // The connection does not exists, return
+                return false;
+            }
+
+            // Check if the connection is stil active
+            if (!connection.IsConnected())
+            {
+                // The connection is already closed, return
+                return false;
+            }
+
+            // Close the connection
+            return connection.CloseConnection();
         }
 
         /// <summary>
@@ -103,7 +154,36 @@ namespace CBSM.Database
         /// <returns>True if the table was created, false if creating failed</returns>
         public bool CreateTable(string name, DatabaseColumn[] columns)
         {
-            return false;
+            // Check if there is a connection to a database
+            if (connection == null)
+            {
+                // There is no connection, return
+                return false;
+            }
+
+            // Check if the connection is active
+            if (!connection.IsConnected())
+            {
+                // The connection is not active, return
+                return false;
+            }
+
+            // Put the input commands into a command
+            StringBuilder sb = new StringBuilder();
+            sb.Append("CREATE TABLE ").Append(name);
+            sb.Append("(");
+            foreach (DatabaseColumn dc in columns)
+            {
+                sb.Append(dc.Name).Append(" ").Append(dc.Type).Append(",");
+            }
+            sb = sb.Remove(sb.Length - 2, 1);
+            sb.Append(")");
+
+            // Convert the command into the syntax of the sepcified database
+            string com = SyntaxConverter.Convert(sb.ToString(), this.databaseType);
+
+            // Run the command agaist the database
+            return connection.ExecuteNonQuery(com);
         }
 
         /// <summary>
@@ -143,6 +223,26 @@ namespace CBSM.Database
         public Administration ReadData()
         {
             return null;
+        }
+
+        private void SetupDatabaseConnection()
+        {
+            // Check if there is a connection active
+            if (connection != null)
+            {
+                // There is a connection active, return
+                return;
+            }
+
+            // Check the type of database on the server and connect using the specified ip address and port
+            if (databaseType == DatabaseConnectionType.MySQL)
+            {
+                connection = new MySQLConnection();
+            }
+            else
+            {
+                connection = new OracleConnection();
+            }
         }
 
         #endregion

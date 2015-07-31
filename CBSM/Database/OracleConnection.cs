@@ -10,6 +10,11 @@ namespace CBSM.Database
         #endregion
 
         #region "Constructors"
+
+        public OracleConnection()
+        {
+        }
+
         #endregion
 
         #region "Properties"
@@ -27,9 +32,9 @@ namespace CBSM.Database
             return false;
         }
 
-        public override void CloseConnection()
+        public override bool CloseConnection()
         {
-            return;
+            return false; ;
         }
 
         public override DataTable ExecuteQuery(string command)

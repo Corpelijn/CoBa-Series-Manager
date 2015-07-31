@@ -34,7 +34,7 @@ namespace CBSM.Database
         /// <summary>
         /// Closes the connection to the database
         /// </summary>
-        public abstract void CloseConnection();
+        public abstract bool CloseConnection();
 
         /// <summary>
         /// Executes a query command to the database
