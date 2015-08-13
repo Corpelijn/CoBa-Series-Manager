@@ -19,7 +19,7 @@ namespace CBSM
         private List<Serie> series;
         private List<Person> people;
 
-        private DatabaseManager database;
+        private DatabaseManager databaseManager;
 
         #endregion
 
@@ -38,7 +38,7 @@ namespace CBSM
         /// <summary>
         /// The Singleton instance for this class
         /// </summary>
-        public Administration Instance { get; set; }
+        public static Administration Instance { get; set; }
 
         #endregion
 
@@ -66,14 +66,14 @@ namespace CBSM
         /// <returns>True if the connection was closed, otherwise false</returns>
         public bool CloseDatabaseConnection()
         {
-            if (database == null)
+            if (databaseManager == null)
             {
                 // There is no connection active, return
                 return false;
             }
 
             // Close the database connection
-            return database.CloseConnection();
+            return databaseManager.CloseConnection();
         }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace CBSM
         public bool ImportDatabase()
         {
             // Check if the database connection is active
-            if (database == null)
+            if (databaseManager == null)
             {
                 // Database connection is nog active, return
                 return false;
@@ -95,7 +95,7 @@ namespace CBSM
             // Read the information from the database
             try
             {
-                this.CopyInformation(database.ReadData());
+                this.CopyInformation(databaseManager.ReadData());
             }
             catch (Exception)
             {
@@ -114,12 +114,12 @@ namespace CBSM
         public bool IsDatabaseConnected()
         {
             // Check if the database connection if active
-            if (database == null)
+            if (databaseManager == null)
             {
                 // Database connection is not active, return
                 return false;
             }
-            return database.IsConnected();
+            return databaseManager.IsConnected();
         }
 
         /// <summary>
@@ -132,14 +132,14 @@ namespace CBSM
         /// <param name="port">Portnumber of the serverport that is hosting the database</param>
         /// <param name="databaseType">The type op database running on the server</param>
         /// <returns>True if the connection to the database was opened, otherwise false</returns>
-        public bool OpenDatabaseConnection(string hostname, int port, Database.DatabaseConnectionType databaseType)
+        public bool OpenDatabaseConnection(string server, int port, string database, DatabaseConnectionType type, string username = "", string password = "")
         {
             try
             {
                 // Check if the hostname is a valid IP address or hostname
-                IPHostEntry ipaddress = Dns.GetHostEntry(hostname);
+                IPHostEntry ipaddress = Dns.GetHostEntry(server);
                 // Convert the ipaddress back to a string
-                hostname = ipaddress.ToString();
+                server = ipaddress.HostName;
             }
             catch (Exception)
             {
@@ -153,18 +153,18 @@ namespace CBSM
             }
 
             // Check if there is an active database connection
-            if (database != null)
+            if (databaseManager != null)
             {
                 // There is already a database connected, return
                 return false;
             }
 
             // Create the connection to the database
-            database = new DatabaseManager(hostname, port, databaseType);
-            if (database != null)
+            databaseManager = new DatabaseManager(server, port, database, type, username, password);
+            if (databaseManager != null)
             {
                 // Open the connection to the database
-                bool result = database.OpenConnection();
+                bool result = databaseManager.OpenConnection();
                 if (!result)
                 {
                     // Opening the database connection failed
@@ -173,7 +173,17 @@ namespace CBSM
             }
             
             // For the idea of something might going wrong
-            return database.IsConnected();
+            return databaseManager.IsConnected();
+        }
+
+        public bool CheckDatabaseTables()
+        {
+            return this.databaseManager.CheckDatabaseTables();
+        }
+
+        public bool CreateMissingDatabaseTables()
+        {
+            return this.databaseManager.CreateMissingDatabaseTables();
         }
 
         #endregion

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace CBSM.Database
 {
-    class DataTable
+    class DataTable1
     {
         #region "Fields"
 
@@ -43,6 +43,11 @@ namespace CBSM.Database
         {
             columns = columns ?? new string[] {"[ALL]"};
             return null;
+        }
+
+        public void AddData(string row)
+        {
+
         }
 
         #endregion

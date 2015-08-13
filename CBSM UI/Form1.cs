@@ -20,10 +20,7 @@ namespace CBSM_UI
         private void Form1_Load(object sender, EventArgs e)
         {
             /*test*/
-            Administration ad = new Administration();
-            while(!ad.IsDatabaseConnected())
-                ad.OpenDatabaseConnection("", 10, CBSM.Database.DatabaseConnectionType.MySQL);
-            ad.ImportDatabase();
+            
         }
     }
 }

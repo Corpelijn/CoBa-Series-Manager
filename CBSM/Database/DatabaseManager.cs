@@ -11,6 +11,9 @@ namespace CBSM.Database
         private string serverip;
         private int serverport;
         private DatabaseConnectionType databaseType;
+        private string database;
+        private string username;
+        private string password;
         private DatabaseConnection connection;
 
         #endregion
@@ -23,11 +26,14 @@ namespace CBSM.Database
         /// <param name="ip">The ip address of the server to connect to. Cannot be null</param>
         /// <param name="port">The port on the database server where the database is located. Must be bigger than 0</param>
         /// <param name="database">The type of database that is running on the server. Cannot be null</param>
-        public DatabaseManager(string ip, int port, DatabaseConnectionType database)
+        public DatabaseManager(string ip, int port, string database, DatabaseConnectionType type, string username, string password)
         {
             this.serverip = ip;
             this.serverport = port;
-            this.databaseType = database;
+            this.databaseType = type;
+            this.database = database;
+            this.username = username;
+            this.password = password;
 
             SetupDatabaseConnection();
         }
@@ -103,7 +109,7 @@ namespace CBSM.Database
             }
 
             // There is no connction active and the object to connect to is created
-            return connection.OpenConnection(this.serverip, this.serverport);
+            return connection.OpenConnection(this.serverip, this.serverport, this.database, this.username, this.password);
         }
 
         /// <summary>
@@ -170,13 +176,14 @@ namespace CBSM.Database
 
             // Put the input commands into a command
             StringBuilder sb = new StringBuilder();
-            sb.Append("CREATE TABLE ").Append(name);
-            sb.Append("(");
+            sb.Append("CREATE TABLE ").Append(name.ToUpper());
+            sb.Append(" ( ");
             foreach (DatabaseColumn dc in columns)
             {
-                sb.Append(dc.Name).Append(" ").Append(dc.Type).Append(",");
+                //sb.Append(dc.Name).Append(" ").Append(dc.Type).Append(", ");
+                sb.Append(dc.ToString());
             }
-            sb = sb.Remove(sb.Length - 2, 1);
+            sb = sb.Remove(sb.Length - 2, 2);
             sb.Append(")");
 
             // Convert the command into the syntax of the sepcified database
@@ -201,7 +208,7 @@ namespace CBSM.Database
         /// </summary>
         /// <param name="command">The query command to execute. Cannot be empty or null</param>
         /// <returns>A DataTable object containing the requested information</returns>
-        public DataTable ExecuteQuery(string command)
+        public DataTable1 ExecuteQuery(string command)
         {
             return null;
         }
@@ -243,6 +250,54 @@ namespace CBSM.Database
             {
                 connection = new OracleConnection();
             }
+        }
+
+        private bool DoesTableExists(string table)
+        {
+            return this.connection.DoesTableExists(table.ToUpper());
+        }
+
+        public bool CheckDatabaseTables()
+        {
+            bool result = true;
+            if (!this.DoesTableExists("serie")) result = false;
+            if (!this.DoesTableExists("seizoen")) result = false;
+            if (!this.DoesTableExists("seizoen_per_serie")) result = false;
+            return result;
+        }
+
+        public bool CreateMissingDatabaseTables()
+        {
+            if (!this.DoesTableExists("SERIE"))
+            {
+                if (!this.CreateTable("SERIE", new DatabaseColumn[] {
+                        new DatabaseColumn("ID", DatabaseColumnType.NUMBER, true),
+                        new DatabaseColumn("NAME", DatabaseColumnType.VARCHAR2_100)
+                })) return false;
+                Console.WriteLine("SERIE TABLE CREATED");
+            }
+
+            if (!this.DoesTableExists("SEIZOEN"))
+            {
+                if (!this.CreateTable("SEIZOEN", new DatabaseColumn[] {
+                        new DatabaseColumn("ID", DatabaseColumnType.NUMBER, true),
+                        new DatabaseColumn("NR", DatabaseColumnType.NUMBER),
+                        new DatabaseColumn("VERHAAL", DatabaseColumnType.VARCHAR2_500)
+                })) return false;
+                Console.WriteLine("SEIZOEN TABLE CREATED");
+            }
+
+            if(!this.DoesTableExists("SEIZOEN_PER_SERIE"))
+            {
+                if(!this.CreateTable("SEIZOEN_PER_SERIE", new DatabaseColumn[] {
+                        new DatabaseColumn("ID", DatabaseColumnType.NUMBER, true),
+                        new DatabaseColumn("SERIE_ID", DatabaseColumnType.NUMBER, new DatabaseColumnForeignKey("FK_SPS_SERIE_ID", "SERIE_ID", "SERIE", "ID")),
+                        new DatabaseColumn("SEIZOEN_ID", DatabaseColumnType.NUMBER, new DatabaseColumnForeignKey("FK_SPS_SEIZOEN_ID", "SEIZOEN_ID", "SEIZOEN", "ID"))
+                })) return false;
+                Console.WriteLine("SEIZOEN_PER_SERIE TABLE CREATED");
+            }
+
+            return true;
         }
 
         #endregion

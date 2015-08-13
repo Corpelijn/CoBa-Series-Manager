@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Text;
 
 namespace CBSM.Database
@@ -23,7 +24,7 @@ namespace CBSM.Database
 
         #region "Methods"
 
-        public override bool OpenConnection(string server, int port)
+        public override bool OpenConnection(string server, int port, string database, string username, string password)
         {
             return false;
         }
@@ -46,6 +47,11 @@ namespace CBSM.Database
         public override bool ExecuteNonQuery(string command)
         {
             return false;
+        }
+
+        public override bool DoesTableExists(string table)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion
