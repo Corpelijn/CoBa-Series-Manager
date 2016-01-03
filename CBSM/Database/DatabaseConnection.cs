@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CBSM.Database.Tables;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Text;
@@ -51,7 +52,9 @@ namespace CBSM.Database
         /// <returns>True if the command was successully executed, false otherwise</returns>
         public abstract bool ExecuteNonQuery(string command);
 
-        public abstract bool DoesTableExists(string table);
+        public abstract bool DoesTableExist(string table);
+
+        public abstract DatabaseColumn DoesColumnExist(string table, string column);
 
         #endregion
     }

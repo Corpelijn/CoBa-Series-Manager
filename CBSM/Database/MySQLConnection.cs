@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CBSM.Database.Tables;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Text;
@@ -49,7 +50,12 @@ namespace CBSM.Database
             return false;
         }
 
-        public override bool DoesTableExists(string table)
+        public override bool DoesTableExist(string table)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override DatabaseColumn DoesColumnExist(string table, string column)
         {
             throw new NotImplementedException();
         }

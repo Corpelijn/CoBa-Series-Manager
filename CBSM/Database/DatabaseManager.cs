@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CBSM.Database.Tables;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -193,6 +194,27 @@ namespace CBSM.Database
             return connection.ExecuteNonQuery(com);
         }
 
+        public bool CreateTable(string name)
+        {
+            if (connection == null)
+            {
+                return false;
+            }
+
+            if (!connection.IsConnected())
+            {
+                return false;
+            }
+
+            StringBuilder sb = new StringBuilder();
+            sb.Append("CREATE TABLE ").Append(name.ToUpper()).Append(" ( ");
+            sb.Append("ID NUMBER PRIMARY KEY);");
+
+            string command = SyntaxConverter.Convert(sb.ToString(), this.databaseType);
+
+            return connection.ExecuteNonQuery(command);
+        }
+
         /// <summary>
         /// Deletes the specified table from the database
         /// </summary>
@@ -254,48 +276,61 @@ namespace CBSM.Database
 
         private bool DoesTableExists(string table)
         {
-            return this.connection.DoesTableExists(table.ToUpper());
+            return this.connection.DoesTableExist(table.ToUpper());
+        }
+
+        private DatabaseColumn DoesColumnExist(string table, string column)
+        {
+            return this.connection.DoesColumnExist(table.ToUpper(), column.ToUpper());
         }
 
         public bool CheckDatabaseTables()
         {
             bool result = true;
-            if (!this.DoesTableExists("serie")) result = false;
-            if (!this.DoesTableExists("seizoen")) result = false;
-            if (!this.DoesTableExists("seizoen_per_serie")) result = false;
+            if (!this.DoesTableExists("serie")) { result = false; ReconstructDatabaseTable("serie"); }
+            if (!this.DoesTableExists("seizoen")) { result = false; ReconstructDatabaseTable("seizoen"); }
+            if (!this.DoesTableExists("seizoen_per_serie")) { result = false; ReconstructDatabaseTable("seizoen_per_serie"); }
             return result;
         }
 
-        public bool CreateMissingDatabaseTables()
+        private bool ReconstructDatabaseTable(string name)
         {
-            if (!this.DoesTableExists("SERIE"))
+            DatabaseTable table = TableInformation.GetTable(name);
+
+            if (!this.DoesTableExists(name))
             {
-                if (!this.CreateTable("SERIE", new DatabaseColumn[] {
-                        new DatabaseColumn("ID", DatabaseColumnType.NUMBER, true),
-                        new DatabaseColumn("NAME", DatabaseColumnType.VARCHAR2_100)
-                })) return false;
-                Console.WriteLine("SERIE TABLE CREATED");
+                // The requested table does not exist, create it
+                CreateTable(name);
             }
 
-            if (!this.DoesTableExists("SEIZOEN"))
-            {
-                if (!this.CreateTable("SEIZOEN", new DatabaseColumn[] {
-                        new DatabaseColumn("ID", DatabaseColumnType.NUMBER, true),
-                        new DatabaseColumn("NR", DatabaseColumnType.NUMBER),
-                        new DatabaseColumn("VERHAAL", DatabaseColumnType.VARCHAR2_500)
-                })) return false;
-                Console.WriteLine("SEIZOEN TABLE CREATED");
-            }
+            //if (!this.DoesTableExists("SERIE"))
+            //{
+            //    if (!this.CreateTable("SERIE", new DatabaseColumn[] {
+            //            new DatabaseColumn("ID", DatabaseColumnType.NUMBER, true),
+            //            new DatabaseColumn("NAME", DatabaseColumnType.VARCHAR2_100)
+            //    })) return false;
+            //    Console.WriteLine("SERIE TABLE CREATED");
+            //}
 
-            if(!this.DoesTableExists("SEIZOEN_PER_SERIE"))
-            {
-                if(!this.CreateTable("SEIZOEN_PER_SERIE", new DatabaseColumn[] {
-                        new DatabaseColumn("ID", DatabaseColumnType.NUMBER, true),
-                        new DatabaseColumn("SERIE_ID", DatabaseColumnType.NUMBER, new DatabaseColumnForeignKey("FK_SPS_SERIE_ID", "SERIE_ID", "SERIE", "ID")),
-                        new DatabaseColumn("SEIZOEN_ID", DatabaseColumnType.NUMBER, new DatabaseColumnForeignKey("FK_SPS_SEIZOEN_ID", "SEIZOEN_ID", "SEIZOEN", "ID"))
-                })) return false;
-                Console.WriteLine("SEIZOEN_PER_SERIE TABLE CREATED");
-            }
+            //if (!this.DoesTableExists("SEIZOEN"))
+            //{
+            //    if (!this.CreateTable("SEIZOEN", new DatabaseColumn[] {
+            //            new DatabaseColumn("ID", DatabaseColumnType.NUMBER, true),
+            //            new DatabaseColumn("NR", DatabaseColumnType.NUMBER),
+            //            new DatabaseColumn("VERHAAL", DatabaseColumnType.VARCHAR2_500)
+            //    })) return false;
+            //    Console.WriteLine("SEIZOEN TABLE CREATED");
+            //}
+
+            //if(!this.DoesTableExists("SEIZOEN_PER_SERIE"))
+            //{
+            //    if(!this.CreateTable("SEIZOEN_PER_SERIE", new DatabaseColumn[] {
+            //            new DatabaseColumn("ID", DatabaseColumnType.NUMBER, true),
+            //            new DatabaseColumn("SERIE_ID", DatabaseColumnType.NUMBER, new DatabaseColumnForeignKey("FK_SPS_SERIE_ID", "SERIE_ID", "SERIE", "ID")),
+            //            new DatabaseColumn("SEIZOEN_ID", DatabaseColumnType.NUMBER, new DatabaseColumnForeignKey("FK_SPS_SEIZOEN_ID", "SEIZOEN_ID", "SEIZOEN", "ID"))
+            //    })) return false;
+            //    Console.WriteLine("SEIZOEN_PER_SERIE TABLE CREATED");
+            //}
 
             return true;
         }

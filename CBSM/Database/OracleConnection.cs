@@ -1,4 +1,5 @@
-﻿using Oracle.DataAccess.Client;
+﻿using CBSM.Database.Tables;
+using Oracle.DataAccess.Client;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -109,9 +110,19 @@ namespace CBSM.Database
             return true;
         }
 
-        public override bool DoesTableExists(string table)
+        public override bool DoesTableExist(string table)
         {
             return ExecuteQuery("select table_name from all_tables where owner = \'" + username.ToUpper() + "\' and table_name = \'" + table + "\'").Rows.Count > 0;
+        }
+
+        public override DatabaseColumn DoesColumnExist(string table, string column)
+        {
+            DataTable dt = ExecuteQuery("SELECT table_name, column_name, data_type, data_length, nullable FROM USER_TAB_COLUMNS WHERE table_name=\'" + table + "\' AND column_name=\'" + column + "\'");
+            if (dt.Rows.Count == 1)
+            {
+                //dt.
+            }
+            return null;
         }
 
         #endregion

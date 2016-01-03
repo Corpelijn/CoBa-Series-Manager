@@ -181,11 +181,6 @@ namespace CBSM
             return this.databaseManager.CheckDatabaseTables();
         }
 
-        public bool CreateMissingDatabaseTables()
-        {
-            return this.databaseManager.CreateMissingDatabaseTables();
-        }
-
         #endregion
 
         #region "Serie"

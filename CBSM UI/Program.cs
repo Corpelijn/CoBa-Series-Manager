@@ -31,7 +31,6 @@ namespace CBSM_UI
             while (!Administration.Instance.CheckDatabaseTables())
             {
                 Console.WriteLine("Creating the required tables . . .");
-                Administration.Instance.CreateMissingDatabaseTables();
             }
 
             Console.WriteLine("The required tables exist");

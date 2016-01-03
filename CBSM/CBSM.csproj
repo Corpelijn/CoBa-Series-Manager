@@ -40,9 +40,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Database\DatabaseColumn.cs" />
-    <Compile Include="Database\DatabaseColumnForeignKey.cs" />
-    <Compile Include="Database\DatabaseColumnType.cs" />
+    <Compile Include="Database\Tables\DatabaseColumn.cs" />
+    <Compile Include="Database\Tables\DatabaseColumnForeignKey.cs" />
     <Compile Include="Database\DatabaseConnection.cs" />
     <Compile Include="Database\DatabaseConnectionType.cs" />
     <Compile Include="Database\DatabaseManager.cs" />
@@ -51,6 +50,8 @@
     <Compile Include="Database\MySQLConnection.cs" />
     <Compile Include="Database\OracleConnection.cs" />
     <Compile Include="Database\SyntaxConverter.cs" />
+    <Compile Include="Database\Tables\DatabaseTable.cs" />
+    <Compile Include="Database\Tables\TableInformation.cs" />
     <Compile Include="Domain\Access.cs" />
     <Compile Include="Domain\AccessGroup.cs" />
     <Compile Include="Administration.cs" />
