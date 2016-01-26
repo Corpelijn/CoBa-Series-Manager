@@ -1,58 +1,47 @@
-﻿using System;
+﻿using CBSM.Database;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace CBSM.Domain
 {
-    /// <summary>
-    /// Hold the information of a serie
-    /// </summary>
-    class Serie
+    public class Serie : DBMS<Serie>
     {
-        #region "Fields"
-
         private int id;
-        private string name;
-        private string codePrefix;
-        private List<Season> seasons;
+        private string naam;
+        private List<Seizoen> seizoenen;
 
-        #endregion
-
-        #region "Constructors"
-        #endregion
-
-        #region "Properties"
-
-        /// <summary>
-        /// Gets or sets the name of the serie
-        /// </summary>
-        public string Name
+        public Serie(string naam) : base()
         {
-            get { return this.name; }
-            set { this.name = value; }
+            this.naam = naam;
+            this.seizoenen = new List<Seizoen>();
         }
 
-        /// <summary>
-        /// Gets or Sets the code prefix for the unique code generation of the serie
-        /// </summary>
-        public string CodePrefix
+        public Serie() : base()
         {
-            get { return this.codePrefix; }
-            set { this.codePrefix = value; }
         }
 
-        /// <summary>
-        /// Gets or sets the seasons that exist in this serie
-        /// </summary>
-        public List<Season> Seasons
+        public void AddSeizoen(Seizoen seizoen)
         {
-            get { return new List<Season>(this.seasons); }
-            set { this.seasons = value; }
+            seizoenen.Add(seizoen);
+        }
+    }
+
+
+    public class Seizoen : DBMS<Seizoen>
+    {
+        private int id;
+        private int code;
+        private Serie serie;
+
+        public Seizoen(int code, Serie serie) : base()
+        {
+            this.code = code;
+            this.serie = serie;
         }
 
-        #endregion
-
-        #region "Methods"
-        #endregion
+        public Seizoen() : base()
+        {
+        }
     }
 }

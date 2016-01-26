@@ -1,55 +1,102 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Text;
 
 namespace CBSM.Database
 {
-    class DataTable1
+    public class DataTable
     {
-        #region "Fields"
+        private List<string> fields;
+        private List<object[]> data;
 
-        private List<string> indexes;
-        private List<DataRow> data;
-
-        #endregion
-
-        #region "Constructors"
-
-        #endregion
-
-        #region "Properties"
-        #endregion
-
-        #region "Methods"
-
-        /// <summary>
-        /// Get data from a row in the DataTable
-        /// </summary>
-        /// <param name="row">The number of the row to fetch</param>
-        /// <param name="columns">The order of the columns to be returned</param>
-        /// <returns>The columns with data in the specified order</returns>
-        public DataRow GetData(int row, string[] columns = null)
+        public DataTable(DbDataReader reader)
         {
-            columns = columns ?? new string[] { "[ALL]" };
-            return null;
+            this.fields = new List<string>();
+            this.data = new List<object[]>();
+
+
+            for (int i = 0; i < reader.FieldCount; i++)
+            {
+                fields.Add(reader.GetName(i));
+            }
+
+            while (reader.Read())
+            {
+                object[] values = new object[reader.FieldCount];
+                for (int i = 0; i < fields.Count; i++)
+                {
+                    values[i] = reader.GetValue(reader.GetOrdinal(fields[i]));
+                }
+                data.Add(values);
+            }
         }
 
-        /// <summary>
-        /// Returns all the rows in the DataTable
-        /// </summary>
-        /// <param name="columns">The order of the columns to be returned</param>
-        /// <returns>All the rows of the DataTable in the order specified</returns>
-        public List<DataRow> GetAllData(string[] columns = null)
+        public int GetRowCount()
         {
-            columns = columns ?? new string[] {"[ALL]"};
-            return null;
+            return this.data.Count;
         }
 
-        public void AddData(string row)
+        public object[] GetRow(int row)
         {
-
+            return data[row];
         }
 
-        #endregion
+        public DataRow GetDataRow(int row)
+        {
+            return new DataRow(fields, data[row]);
+        }
+
+        public object[] GetDataFromRow(string[] columns, int row)
+        {
+            object[] values = new object[columns.Length];
+            for (int i = 0; i < columns.Length; i++)
+            {
+                int index = fields.IndexOf(columns[i]);
+                values[i] = data[row][index];
+            }
+
+            return values;
+        }
+
+        public object GetObjectFromRow(string column, int row)
+        {
+            return data[row][fields.IndexOf(column)];
+        }
+
+        public System.Collections.IEnumerator GetEnumerator()
+        {
+            for (int i = 0; i < data.Count; i++)
+            {
+                yield return new DataRow(fields, data[i]);
+            }
+        }
+    }
+
+    public class DataRow
+    {
+        private List<string> fields;
+        private object[] data;
+
+        public DataRow(List<string> fields, object[] data)
+        {
+            this.fields = fields;
+            this.data = data;
+        }
+
+        public object GetObject(string column)
+        {
+            return data[fields.IndexOf(column)];
+        }
+
+        public string GetField(int i)
+        {
+            return fields[i];
+        }
+
+        public int GetFieldCount()
+        {
+            return fields.Count;
+        }
     }
 }

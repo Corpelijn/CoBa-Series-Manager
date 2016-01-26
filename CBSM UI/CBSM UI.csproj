@@ -75,7 +75,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CBSM\CBSM.csproj">
-      <Project>{6a118816-cb15-4e75-a0f5-0324fef3554a}</Project>
+      <Project>{f85534b6-097c-4db2-bcbc-22cc2d39472e}</Project>
       <Name>CBSM</Name>
     </ProjectReference>
   </ItemGroup>

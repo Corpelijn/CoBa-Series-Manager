@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{6A118816-CB15-4E75-A0F5-0324FEF3554A}</ProjectGuid>
+    <ProjectGuid>{F85534B6-097C-4DB2-BCBC-22CC2D39472E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CBSM</RootNamespace>
@@ -20,7 +20,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -31,49 +30,25 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Oracle.DataAccess, Version=2.121.1.0, Culture=neutral, PublicKeyToken=89b483f429c47342, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\School\SME webapp\Dependencies\Oracle.DataAccess.dll</HintPath>
+    <Reference Include="MySql.Data">
+      <HintPath>..\..\..\TFS\School\MySql.Data.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Database\Tables\DatabaseColumn.cs" />
-    <Compile Include="Database\Tables\DatabaseColumnForeignKey.cs" />
-    <Compile Include="Database\DatabaseConnection.cs" />
-    <Compile Include="Database\DatabaseConnectionType.cs" />
-    <Compile Include="Database\DatabaseManager.cs" />
-    <Compile Include="Database\DataRow.cs" />
+    <Compile Include="Database\Column.cs" />
     <Compile Include="Database\DataTable.cs" />
+    <Compile Include="Database\FK.cs" />
+    <Compile Include="Database\IDatabaseConnection.cs" />
+    <Compile Include="Database\DatabaseManager.cs" />
+    <Compile Include="Database\DBMS.cs" />
     <Compile Include="Database\MySQLConnection.cs" />
-    <Compile Include="Database\OracleConnection.cs" />
-    <Compile Include="Database\SyntaxConverter.cs" />
-    <Compile Include="Database\Tables\DatabaseTable.cs" />
-    <Compile Include="Database\Tables\TableInformation.cs" />
-    <Compile Include="Domain\Access.cs" />
-    <Compile Include="Domain\AccessGroup.cs" />
-    <Compile Include="Administration.cs" />
-    <Compile Include="Domain\Episode.cs" />
-    <Compile Include="Domain\Attribute.cs" />
-    <Compile Include="Domain\Availability.cs" />
-    <Compile Include="Domain\Fragment.cs" />
-    <Compile Include="Domain\Clothing.cs" />
-    <Compile Include="Domain\ClothingPerScene.cs" />
-    <Compile Include="Domain\FragmentStatus.cs" />
-    <Compile Include="Domain\Location.cs" />
-    <Compile Include="Domain\Character.cs" />
-    <Compile Include="Domain\Person.cs" />
-    <Compile Include="Domain\Scene.cs" />
-    <Compile Include="Domain\Season.cs" />
+    <Compile Include="Domain\Account.cs" />
+    <Compile Include="Domain\Customer.cs" />
     <Compile Include="Domain\Serie.cs" />
-    <Compile Include="Domain\Staff.cs" />
-    <Compile Include="Exceptions\IllegalArgumentException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ClassDiagram1.cd" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
