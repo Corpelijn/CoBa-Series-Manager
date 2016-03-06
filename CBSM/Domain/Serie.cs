@@ -7,7 +7,6 @@ namespace CBSM.Domain
 {
     public class Serie : DBMS<Serie>
     {
-        private int id;
         private string naam;
         private List<Seizoen> seizoenen;
 
@@ -30,7 +29,6 @@ namespace CBSM.Domain
 
     public class Seizoen : DBMS<Seizoen>
     {
-        private int id;
         private int code;
         private Serie serie;
 

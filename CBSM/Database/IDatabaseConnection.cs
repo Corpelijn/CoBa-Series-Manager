@@ -15,19 +15,26 @@ namespace CBSM.Database
 
         bool IsOpen();
 
+        void InitializeConnection();
+
         DataTable ExecuteQuery(string query);
 
         void ExecuteNonQuery(string query);
 
+        int ExecuteInsert(string query);
+
         string GetDatabasename();
 
+        string CreateLinkTable(string table1, string table2, string columnname);
 
-        void CreateTable(object data);
+        void CreateTable(Type type);
 
         bool DoesTableExists(Type type);
 
+        bool DoesTableExists(string tablename);
+
         void UpdateTable(object data);
 
-        string GetFieldType(FieldInfo info, object data);
+        string GetFieldType(FieldInfo info);
     }
 }

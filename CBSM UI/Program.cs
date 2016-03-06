@@ -19,10 +19,14 @@ namespace CBSM_UI
 
             Serie serie = new Serie("Frank & Dale");
             Seizoen seizoen = new Seizoen(1, serie);
+            Seizoen seizoen2 = new Seizoen(2, serie);
 
             serie.AddSeizoen(seizoen);
+            serie.AddSeizoen(seizoen2);
 
             serie.WriteToDatabase();
+            seizoen.WriteToDatabase();
+            seizoen2.WriteToDatabase();
 
             //try
             {

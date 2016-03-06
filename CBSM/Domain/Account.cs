@@ -7,7 +7,6 @@ namespace CBSM.Domain
 {
     public class Account : DBMS<Account>
     {
-        private int id;             // PK (do not write to)
         private string username;
         private string password;
 
@@ -31,11 +30,6 @@ namespace CBSM.Domain
         {
             get { return this.password; }
             set { this.password = value; }
-        }
-
-        public int Id
-        {
-            get { return this.id; }
         }
     }
 }

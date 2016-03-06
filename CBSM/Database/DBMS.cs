@@ -10,12 +10,9 @@ namespace CBSM.Database
         #region "Attributes"
 
         /// <summary>
-        /// Defines the name primary key of the table. The value must be a attribute of the class. 
-        /// Default: ID
+        /// The primary key of the table
         /// </summary>
-        protected string pk = "id";
-
-        private bool isWrittenToDatabase;
+        protected int id;
 
         #endregion
 
@@ -26,7 +23,7 @@ namespace CBSM.Database
         /// </summary>
         public DBMS()
         {
-            this.GetType().GetField(pk, BindingFlags.Instance | BindingFlags.NonPublic).SetValue(this, -1);
+            this.id = -1;
             DatabaseManager.GetInstance().AddTable(this);
         }
 
@@ -57,7 +54,7 @@ namespace CBSM.Database
         /// <returns>Returns the primary key of this table</returns>
         public string GetPrimaryKey()
         {
-            return this.pk;
+            return "id";
         }
 
         /// <summary>
@@ -67,6 +64,16 @@ namespace CBSM.Database
         public object GetPrimaryKeyValue()
         {
             return this.GetType().GetField(GetPrimaryKey(), BindingFlags.NonPublic | BindingFlags.Instance).GetValue(this);
+        }
+
+        public void SetInaccessible()
+        {
+            this.id = this.id == -1 ? -2 : this.id;
+        }
+
+        public void SetAccessible()
+        {
+            this.id = this.id == -2 ? -1 : this.id;
         }
 
         #endregion
@@ -208,7 +215,80 @@ namespace CBSM.Database
 
         public static T[] GetMutipleFromDatabase(params string[] constraints)
         {
-            return null;
+            // Instantiate a new value of type T
+            List<T> ret_val = new List<T>();
+
+            // Create a select query from the constraints
+            string table = ret_val.GetType().GetGenericArguments()[0].Name;
+            string query = "select * from " + table + " where ";
+            StringBuilder where_clause = new StringBuilder();
+
+            foreach (string constraint in constraints)
+            {
+                where_clause.Append(constraint + " and ");
+            }
+
+            // Remove the last ' and ' from the instruction
+            where_clause = where_clause.Remove(where_clause.Length - 5, 5);
+            // Execute the command to the database
+            DataTable dt = DatabaseManager.GetInstance().ExecuteQuery(query + where_clause);
+
+            // Check if the database has returned a single record
+            if (dt.GetRowCount() > 0)
+            {
+                // Get the record from the database
+                foreach (DataRow row in dt)
+                {
+                    T value = new T();
+                    // Loop through the columns returned by the database
+                    for (int i = 0; i < row.GetFieldCount(); i++)
+                    {
+                        // Get the type of the class (typeof(T))
+                        Type type = value.GetType();
+
+                        // Get the information from a field. The name of the field should be the same as the name of the column
+                        FieldInfo fi = type.GetField(row.GetField(i), BindingFlags.NonPublic | BindingFlags.Instance);
+
+                        // Check if the attribute of the class equals to a DBMS type. If so the record is a foreign key
+                        if (fi.FieldType.IsSubclassOf(typeof(DBMS)))
+                        {
+                            // The field is a foreign key
+
+                            // Get the data of the single object from the database by calling the 'GetFromDatabase' method
+                            MethodInfo database = fi.FieldType.BaseType.GetMethod("GetFromDatabase", BindingFlags.Public | BindingFlags.Static);
+
+                            // Define a constraint to find a single record
+                            string constraint = DatabaseManager.GetInstance().GetPrimaryKey(value.GetType().Name) + "=" + row.GetObject(row.GetField(i));
+
+                            // Get the data object from the database
+                            object fk = database.Invoke(null, new object[] { new string[] { constraint } });
+
+                            // Set the received value to the correct field
+                            fi.SetValue(value, fk);
+                        }
+                        else
+                        {
+                            // The field is a normal value, set the data to the object
+                            fi.SetValue(value, row.GetObject(row.GetField(i)));
+                        }
+                    }
+                    ret_val.Add(value);
+                }
+            }
+            //// Triggers when the database return no records
+            //else
+            //{
+            //    query = "";
+            //    foreach (string constraint in constraints)
+            //    {
+            //        query += constraint + " and ";
+            //    }
+            //    query = query.Remove(query.Length - 5);
+            //    throw new Exception("There is no record found with the specified constraints\nGet: " + table + "-object where " + query);
+            //}
+
+            // Return the new value with the correct values
+            return ret_val.ToArray();
         }
     }
 }

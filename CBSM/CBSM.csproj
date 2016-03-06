@@ -38,9 +38,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Database\Column.cs" />
+    <Compile Include="Database\DatabaseSetting.cs" />
     <Compile Include="Database\DataTable.cs" />
-    <Compile Include="Database\FK.cs" />
     <Compile Include="Database\IDatabaseConnection.cs" />
     <Compile Include="Database\DatabaseManager.cs" />
     <Compile Include="Database\DBMS.cs" />

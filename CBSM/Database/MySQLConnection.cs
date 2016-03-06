@@ -1,5 +1,6 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
@@ -32,8 +33,8 @@ namespace CBSM.Database
         /// </summary>
         /// <returns>The name of the database</returns>
         public string GetDatabasename()
-        { 
-            return this.databasename; 
+        {
+            return this.databasename;
         }
 
         /// <summary>
@@ -62,6 +63,10 @@ namespace CBSM.Database
             }
 
             return this.IsOpen();
+        }
+
+        public void InitializeConnection()
+        {
         }
 
         /// <summary>
@@ -109,50 +114,125 @@ namespace CBSM.Database
             command.ExecuteNonQuery();
         }
 
+        public int ExecuteInsert(string query)
+        {
+            MySqlCommand command = new MySqlCommand(query + "; select last_insert_id();", connection);
+            return Convert.ToInt32(command.ExecuteScalar());
+        }
+
         public void CreateTable(Type type)
         {
+            StringBuilder command = new StringBuilder();
+            command.Append("create table ").Append(type.Name).Append(" (\n");
+            int instructionLength = command.Length;
+
+            foreach (FieldInfo fi in type.GetFields(BindingFlags.NonPublic | BindingFlags.Instance))
+            {
+                if (fi.Name == "id")
+                {
+                    command = command.Insert(instructionLength, "id\tint(11)\tauto_increment primary key,\n");
+                }
+                else if (typeof(IList).IsAssignableFrom(fi.FieldType))
+                {
+                    // Do not place the column into the table. It is a reference to a link table
+
+                    //CreateLinkTable(new string[] { type.Name, fi.FieldType.Name });
+                }
+                else
+                {
+                    command.Append(fi.Name).Append(" \t").Append(GetFieldType(fi)).Append(",\n");
+                    if (fi.FieldType.IsSubclassOf(typeof(DBMS)))
+                    {
+                        command.Append("constraint table_").Append(type.Name).Append("\tforeign key (").Append(fi.Name).Append(")\treferences ").Append(fi.FieldType.Name).Append("(id),\n");
+                    }
+                }
+            }
+
+            command.Remove(command.Length - 2, 2);
+            command.Append(")");
+
+            Console.WriteLine(command.ToString());
+            this.ExecuteNonQuery(command.ToString());
+        }
+
+        public string CreateLinkTable(string table1, string table2, string columnname)
+        {
+            StringBuilder command = new StringBuilder();
+            command.Append("create table ");
+
+            int nextLinkNum = Convert.ToInt32(DatabaseSettings.GetValue(DBSettings.NextLinkNumber));
+            string fk_name_1 = (nextLinkNum + 1).ToString("000000");
+            string fk_name_2 = (nextLinkNum + 2).ToString("000000");
+            string tablename = "link_" + nextLinkNum.ToString("000000");
+
+            command.Append(tablename);
+
+            command.Append(" (\n");
+            command.Append("id\tint(11)\tauto_increment primary key,\n");
+
+            command.Append(table1.ToLower()).Append("_id\tint(11),\n");
+            command.Append("constraint fk_").Append(fk_name_1).Append("\t FOREIGN KEY (" + table1 + "_id)\tREFERENCES " + table1 + "(id),\n");
+            command.Append(table2.ToLower()).Append("_id\tint(11),\n");
+            command.Append("constraint fk_").Append(fk_name_2).Append("\t FOREIGN KEY (" + table2 + "_id)\tREFERENCES " + table2 + "(id),\n");
+
+            command = command.Remove(command.Length - 2, 1).Append(")");
+
+            Console.WriteLine(command.ToString());
+            this.ExecuteNonQuery(command.ToString());
+
+            DatabaseSettings.SetValue(DBSettings.NextLinkNumber, (nextLinkNum + 3).ToString());
+            DatabaseSettings.SetTable(table1, table2, columnname, tablename);
+
+            return tablename;
         }
 
         /// <summary>
         /// Creates a new table in the database
         /// </summary>
         /// <param name="data">A reference to an object the create the table with</param>
-        public void CreateTable(object data)
-        {
-            string command = "create table " + data.GetType().Name + " (\n";
-            bool hasPK = false;
-            foreach (FieldInfo fi in data.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance))
-            {
-                // Ignore 'pk' field
-                if (fi.Name == "pk")
-                    continue;
+        //public void CreateTable(object data)
+        //{
+        //    string command = "create table " + data.GetType().Name + " (\n";
+        //    bool hasPK = false;
+        //    foreach (FieldInfo fi in data.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance))
+        //    {
+        //        // Ignore 'pk' field
+        //        if (fi.Name == "pk")
+        //            continue;
 
-                command += fi.Name + "\t";
-                command += GetFieldType(fi, fi.GetValue(data));
+        //        command += fi.Name + "\t";
+        //        command += GetFieldType(fi, fi.GetValue(data));
 
-                if (fi.Name == ((DBMS)data).GetPrimaryKey())
-                {
-                    command += "\t" + (fi.FieldType.Name.StartsWith("Int") || fi.FieldType.Name == "Float" || fi.FieldType.Name == "Double" ? "auto_increment " : "") + " primary key";
-                    hasPK = true;
-                }
+        //        if (fi.Name == ((DBMS)data).GetPrimaryKey())
+        //        {
+        //            command += "\t" + (fi.FieldType.Name.StartsWith("Int") || fi.FieldType.Name == "Float" || fi.FieldType.Name == "Double" ? "auto_increment " : "") + " primary key";
+        //            hasPK = true;
+        //        }
 
-                command += ",\n";
-            }
-            command = command.Remove(command.Length - 2);
-            command += ")";
+        //        command += ",\n";
+        //    }
+        //    command = command.Remove(command.Length - 2);
+        //    command += ")";
 
-            if (!hasPK)
-            {
-                throw new Exception("The table has no primary key. Declare an attribute \'id\' or define a custom primary key");
-            }
+        //    if (!hasPK)
+        //    {
+        //        throw new Exception("The table has no primary key. Declare an attribute \'id\' or define a custom primary key");
+        //    }
 
-            Console.WriteLine(command);
-            this.ExecuteNonQuery(command);
-        }
+        //    Console.WriteLine(command);
+        //    this.ExecuteNonQuery(command);
+        //}
 
         public bool DoesTableExists(Type type)
         {
             DataTable dt = this.ExecuteQuery("select table_name from information_schema.tables where table_schema=\'" + this.GetDatabasename() + "\' and table_name=\'" + type.Name + "\';");
+
+            return dt.GetRowCount() > 0;
+        }
+
+        public bool DoesTableExists(string tablename)
+        {
+            DataTable dt = this.ExecuteQuery("select table_name from information_schema.tables where table_schema=\'" + this.GetDatabasename() + "\' and table_name=\'" + tablename + "\';");
 
             return dt.GetRowCount() > 0;
         }
@@ -197,7 +277,35 @@ namespace CBSM.Database
             }
         }
 
-        public string GetFieldType(System.Reflection.FieldInfo info, object data)
+        //public string GetFieldType(System.Reflection.FieldInfo info, object data)
+        //{
+        //    switch (info.FieldType.Name)
+        //    {
+        //        case "String":
+        //            return "varchar(1)";
+        //        case "Int16":
+        //        case "Int32":
+        //            return "int(11)";
+        //        case "Int64":
+        //            return "bigint(22)";
+        //        case "DateTime":
+        //            return "date";
+        //        case "Double":
+        //        case "Float":
+        //            return "decimal(9, 10)";
+        //        default:
+        //            // Check for a foreign key
+        //            if (info.FieldType.IsSubclassOf(typeof(DBMS)))
+        //            {
+        //                // This is a foreign key. Return the type of the PK of the class
+        //                DBMS col = (DBMS)data;
+        //                return GetFieldType(col.GetType().GetField(col.GetPrimaryKey(), BindingFlags.NonPublic | BindingFlags.Instance), null);
+        //            }
+        //            return "int(11)";
+        //    }
+        //}
+
+        public string GetFieldType(FieldInfo info)
         {
             switch (info.FieldType.Name)
             {
@@ -218,10 +326,9 @@ namespace CBSM.Database
                     if (info.FieldType.IsSubclassOf(typeof(DBMS)))
                     {
                         // This is a foreign key. Return the type of the PK of the class
-                        DBMS col = (DBMS)data;
-                        return GetFieldType(col.GetType().GetField(col.GetPrimaryKey(), BindingFlags.NonPublic | BindingFlags.Instance), null);
+                        return "int(11)";
                     }
-                    return "int(11)";
+                    return "blob";
             }
         }
 
